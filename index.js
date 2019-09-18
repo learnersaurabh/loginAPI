@@ -12,6 +12,11 @@ app.use(bodyParser.json());
 //const routes = require('./routes/api');
 app.use('/api',require('./routes/api'));
 
+//error handling
+app.use(function(err, req, res, next){
+    res.send({error: err.message});
+});
+
 
 
 app.listen(5000, function(req,res){

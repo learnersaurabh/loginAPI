@@ -11,35 +11,27 @@ router.get('/user', function(req,res){
     res.send({type: 'GET'});
     res.end();
 })
-router.post('/user', function(req,res){
+router.post('/user', function(req,res, next){
     userR.create(req.body).then(function(user){
         res.send(user);
-    });
+    }).catch(next);
 });
 
 // userLogin
-router.post('/userlogin', function(req,res){
-    //res.send(req.body.username);
-
-    MongoClient.connect(url, function(err, db) {
-        if (err) throw err;
-        var dbo = db.db("test");
-        dbo.collection("userrs").findOne({username : req.body.username}, function(err, result) {
-          if (err) throw err;
-          if(result != null){
-            if(req.body.password == result.password){
-                console.log(`WElcome ${result.name}`);
-              }else{
-                  console.log("Wrong Password, Please try again!")
-        }
-          }else 
-          console.log("Invalid user, Please Register first");
-              
-        
-          db.close();
-        });
-      });
-    res.end();
+router.post('/userlogin', function(req,res,next){
+  userR.findOne({username : req.body.username}).then(function(result){
+      if(result != null){
+        if(req.body.password == result.password){
+            res.send(`WElcome ${result.name}`);
+          }else{
+              res.send("Wrong Password, Please try again!");
+              res.end();
+            }
+      }else{
+      res.send("Invalid user, Please Register first");
+      res.end();
+      }
+      }).catch(next);
  });
 
 
